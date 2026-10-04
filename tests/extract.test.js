@@ -60,3 +60,35 @@ test("link roundup with headings and short paragraphs is still an article", () =
   assert.strictEqual(r.ok, true);
   assert.ok(r.markdown.includes("### [Headline number 0 about technology]"));
 });
+
+test("words counts article text, not markdown syntax", () => {
+  const expected = new Readability(load(fixture("article.html")), { keepClasses: true })
+    .parse().textContent.split(/\s+/).filter(Boolean).length;
+  assert.strictEqual(run(fixture("article.html")).words, expected);
+});
+
+// Simulate the browser content-script world: no Node `module`, libs as globals.
+const vm = require("node:vm");
+const convertSrc = fs.readFileSync(path.join(__dirname, "../src/convert.js"), "utf8");
+const extractSrc = fs.readFileSync(path.join(__dirname, "../extract.js"), "utf8");
+function browserWorld(extra) {
+  const ctx = vm.createContext({ ...extra });
+  ctx.globalThis = ctx;
+  vm.runInContext(convertSrc, ctx);
+  vm.runInContext(extractSrc, ctx);
+  return ctx;
+}
+
+test("page with element named #require (window.require is a DOM node) does not break injection", () => {
+  const ctx = browserWorld({ require: { nodeName: "DIV" } });
+  assert.strictEqual(typeof ctx.__dotmdExtract, "function");
+});
+
+test("__dotmdExtract returns reason 'error' instead of throwing when conversion crashes", () => {
+  const ctx = browserWorld({
+    document: { cloneNode() { throw new Error("boom"); } },
+    location: { href: "https://x.test/" },
+  });
+  // vm objects have a different prototype realm, so compare as JSON.
+  assert.strictEqual(JSON.stringify(ctx.__dotmdExtract()), '{"ok":false,"reason":"error"}');
+});

@@ -1,6 +1,7 @@
 (function (root) {
-  const convert =
-    typeof require !== "undefined" ? require("./src/convert.js") : root.DotMD;
+  // In the browser convert.js has already set root.DotMD; a page element with id="require"
+  // can shadow window.require, so never call it when DotMD exists.
+  const convert = root.DotMD || require("./src/convert.js");
   const MIN_TEXT_LENGTH = 200;
   const MAX_LINK_DENSITY = 0.5;
   const MIN_PARAGRAPHS = 3;
@@ -65,7 +66,7 @@
       ok: true,
       title,
       markdown: convert.buildMarkdown(meta, body),
-      words: body.split(/\s+/).filter(Boolean).length,
+      words: parsed.textContent.split(/\s+/).filter(Boolean).length,
       filename: `${convert.slugify(title)}.md`,
     };
   }
@@ -73,13 +74,18 @@
   if (typeof module !== "undefined" && module.exports) {
     module.exports = { extractArticle };
   } else {
-    root.__dotmdExtract = () =>
-      extractArticle(document.cloneNode(true), {
-        url: location.href,
-        now: new Date(),
-        Readability: root.Readability,
-        TurndownService: root.TurndownService,
-        gfm: root.turndownPluginGfm.gfm,
-      });
+    root.__dotmdExtract = () => {
+      try {
+        return extractArticle(document.cloneNode(true), {
+          url: location.href,
+          now: new Date(),
+          Readability: root.Readability,
+          TurndownService: root.TurndownService,
+          gfm: root.turndownPluginGfm.gfm,
+        });
+      } catch (err) {
+        return { ok: false, reason: "error" };
+      }
+    };
   }
 })(typeof globalThis !== "undefined" ? globalThis : this);

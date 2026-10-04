@@ -48,3 +48,7 @@ test("buildFrontmatter and buildMarkdown collapse newlines and tabs in title and
   assert.ok(fm.includes("title: A B") && fm.includes("author: X Y"), fm);
   assert.ok(buildMarkdown({ title: "A\nB" }, "x").includes("# A B\n"));
 });
+
+test("slugify strips accents instead of dropping the letters", () => {
+  assert.strictEqual(slugify("Café Résumé"), "cafe-resume");
+});

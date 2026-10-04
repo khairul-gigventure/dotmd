@@ -37,16 +37,21 @@ async function run() {
     return showError("Page ni tak boleh diakses");
   }
 
+  if (result && result.reason === "error") return showError("Gagal tukar page ni");
   if (!result || !result.ok) return showError("Tak jumpa article di page ni");
 
-  statusEl.textContent = result.title;
+  statusEl.textContent = result.title || "(Tiada tajuk)";
   metaEl.textContent = `${result.words} perkataan`;
   metaEl.hidden = false;
   copyBtn.disabled = downloadBtn.disabled = false;
 
   copyBtn.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(result.markdown);
-    copyBtn.textContent = "Copied ✓";
+    try {
+      await navigator.clipboard.writeText(result.markdown);
+      copyBtn.textContent = "Copied ✓";
+    } catch (err) {
+      copyBtn.textContent = "Gagal copy";
+    }
     setTimeout(() => (copyBtn.textContent = "Copy Markdown"), 1500);
   });
   downloadBtn.addEventListener("click", () => download(result.filename, result.markdown));
