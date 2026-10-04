@@ -12,10 +12,13 @@ Output ada frontmatter (`title`, `author`, `source`, `clipped`) diikuti `# Title
 
 ## Install (Arc)
 
-1. Buka `chrome://extensions` (Arc boleh guna URL ni).
-2. Hidupkan **Developer mode**.
-3. Klik **Load unpacked** dan pilih folder `dotmd` ni.
-4. Pin ikon DotMD di toolbar.
+1. Download `dotmd-<version>.zip` dari [Releases](https://github.com/khairul-gigventure/dotmd/releases/latest) (repo private: perlu login GitHub akaun `khairul-gigventure`).
+2. Double-click zip tu untuk unzip, dan simpan foldernya di tempat tetap (jangan padam, sebab Arc baca terus dari folder ni).
+3. Buka `chrome://extensions` dan hidupkan **Developer mode**.
+4. Klik **Load unpacked** dan pilih folder yang dah di-unzip.
+5. Pin ikon DotMD di toolbar.
+
+Nak update: download zip versi baru, ganti isi folder lama, dan klik butang reload pada kad DotMD di `chrome://extensions`.
 
 ## Development
 
@@ -23,6 +26,7 @@ Output ada frontmatter (`title`, `author`, `source`, `clipped`) diikuti `# Title
 npm install     # dev dependencies (tests sahaja)
 npm test        # jalankan test
 npm run vendor  # update lib/ dari node_modules
+npm run zip     # bina dist/dotmd-<version>.zip untuk release
 ```
 
 Extension sendiri tiada build step — `lib/` dah di-commit.

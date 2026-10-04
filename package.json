@@ -5,7 +5,8 @@
   "description": "Arc/Chromium extension: article → clean Markdown",
   "scripts": {
     "test": "node --test",
-    "vendor": "sh scripts/vendor.sh"
+    "vendor": "sh scripts/vendor.sh",
+    "zip": "sh scripts/package.sh"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.6.0",
