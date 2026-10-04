@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "DotMD",
+  "version": "0.1.0",
+  "description": "Tukar article di tab semasa jadi Markdown yang bersih — Copy atau Download.",
+  "permissions": ["activeTab", "scripting", "clipboardWrite"],
+  "action": {
+    "default_title": "DotMD",
+    "default_popup": "popup.html"
+  }
+}

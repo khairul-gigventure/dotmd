@@ -1,0 +1,16 @@
+{
+  "name": "dotmd",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Arc/Chromium extension: article → clean Markdown",
+  "scripts": {
+    "test": "node --test",
+    "vendor": "sh scripts/vendor.sh"
+  },
+  "devDependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "jsdom": "^30.1.2",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2"
+  }
+}
