@@ -5,8 +5,13 @@ Extension untuk Arc (dan browser Chromium lain) yang tukar article di tab semasa
 ## Cara guna
 
 1. Buka article (contoh Medium, Substack, blog).
-2. Klik ikon **DotMD** di toolbar.
+2. Klik ikon **DotMD** di toolbar. Satu panel muncul di sebelah kanan page.
 3. Klik **Copy Markdown** atau **Download .md**.
+4. Klik ikon lagi (atau butang ×) untuk tutup panel.
+
+Page yang tak boleh dibuka extension (contohnya `chrome://`) akan tunjuk badge `!` pada ikon.
+
+> Arc tak sokong `chrome.sidePanel`, jadi panel ni dilukis terus dalam page (Shadow DOM) supaya CSS page tak ganggu.
 
 Output ada frontmatter (`title`, `author`, `source`, `clipped`) diikuti `# Title` dan isi article. Gambar kekal sebagai link. Semua proses dalam browser — tiada server, tiada data keluar.
 

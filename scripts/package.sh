@@ -6,5 +6,5 @@ VERSION=$(node -p 'require("./manifest.json").version')
 OUT="dist/dotmd-$VERSION.zip"
 mkdir -p dist
 rm -f "$OUT"
-zip -qr "$OUT" manifest.json popup.html popup.css popup.js extract.js src lib icons
+zip -qr "$OUT" manifest.json background.js panel.js extract.js src lib icons
 echo "$OUT"

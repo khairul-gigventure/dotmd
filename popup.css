@@ -1,9 +1,0 @@
-:root { color-scheme: light dark; }
-body { width: 300px; margin: 0; padding: 14px; font: 13px/1.4 -apple-system, system-ui, sans-serif; }
-h1 { margin: 0 0 8px; font-size: 15px; }
-#status { margin: 0 0 4px; font-weight: 600; word-break: break-word; }
-#meta { margin: 0 0 10px; opacity: .7; }
-.actions { display: flex; gap: 8px; margin-top: 10px; }
-button { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #8884; background: #8881; font: inherit; cursor: pointer; }
-button:hover:not(:disabled) { background: #8883; }
-button:disabled { opacity: .4; cursor: default; }
