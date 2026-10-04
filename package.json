@@ -1,8 +1,26 @@
 {
   "name": "dotmd",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Arc/Chromium extension: article → clean Markdown",
+  "license": "MIT",
+  "author": "Khairul Ikhwan Zulkefly",
+  "homepage": "https://github.com/khairul-gigventure/dotmd#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khairul-gigventure/dotmd.git"
+  },
+  "bugs": {
+    "url": "https://github.com/khairul-gigventure/dotmd/issues"
+  },
+  "keywords": [
+    "chrome-extension",
+    "arc",
+    "markdown",
+    "readability",
+    "article",
+    "ai"
+  ],
   "scripts": {
     "test": "node --test",
     "vendor": "sh scripts/vendor.sh",
