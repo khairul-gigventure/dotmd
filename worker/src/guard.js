@@ -14,23 +14,39 @@ const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 function isPrivateIPv4(host) {
   const m = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
   if (!m) return false;
-  const [a, b] = [Number(m[1]), Number(m[2])];
+  const [a, b, c] = [Number(m[1]), Number(m[2]), Number(m[3])];
   return (
     a === 0 || a === 10 || a === 127 ||
     (a === 169 && b === 254) ||
     (a === 172 && b >= 16 && b <= 31) ||
     (a === 192 && b === 168) ||
-    (a === 100 && b >= 64 && b <= 127)
+    (a === 192 && b === 0 && c === 0) || // 192.0.0.0/24 IETF protocol assignments
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 198 && (b === 18 || b === 19)) || // 198.18.0.0/15 benchmarking
+    a >= 224 // multicast, reserved, broadcast
   );
 }
 
+// Expand a normalized IPv6 literal into 8 numeric groups (the URL parser already compresses/normalizes it).
+function ipv6Groups(host) {
+  const [head, tail] = host.split("::");
+  const h = head ? head.split(":") : [];
+  const t = tail === undefined ? [] : tail ? tail.split(":") : [];
+  const fill = tail === undefined ? [] : new Array(8 - h.length - t.length).fill("0");
+  return [...h, ...fill, ...t].map((g) => parseInt(g, 16));
+}
+
 function isPrivateIPv6(host) {
-  const h = host.toLowerCase();
-  if (h === "::1" || h === "::") return true;
-  if (h.startsWith("::ffff:") || h.startsWith("64:ff9b:")) return true; // IPv4-mapped / NAT64
-  const first = h.split(":")[0];
-  if (/^f[cd][0-9a-f]{2}$/.test(first)) return true; // fc00::/7
-  if (/^fe[89ab][0-9a-f]$/.test(first)) return true; // fe80::/10
+  const g = ipv6Groups(host.toLowerCase());
+  if (g.length !== 8 || g.some(Number.isNaN)) return true; // unparsable: refuse
+  if (g.slice(0, 6).every((x) => x === 0)) return true; // ::, ::1 and IPv4-compatible ::a.b.c.d
+  if (g.slice(0, 5).every((x) => x === 0) && g[5] === 0xffff) return true; // IPv4-mapped
+  if (g[0] === 0x64 && g[1] === 0xff9b) return true; // NAT64
+  if (g[0] === 0x2002) return true; // 6to4 can embed any IPv4
+  if ((g[0] & 0xfe00) === 0xfc00) return true; // fc00::/7 unique local
+  if ((g[0] & 0xffc0) === 0xfe80) return true; // fe80::/10 link-local
+  if ((g[0] & 0xffc0) === 0xfec0) return true; // fec0::/10 site-local
+  if ((g[0] & 0xff00) === 0xff00) return true; // ff00::/8 multicast
   return false;
 }
 
@@ -51,10 +67,11 @@ export function validateUrl(raw) {
     return { ok: true, url };
   }
   host = host.replace(/\.$/, "");
-  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host === "") {
+  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host.endsWith(".internal") || host === "") {
     return { ok: false, error: "unsupported-url" };
   }
   if (isPrivateIPv4(host)) return { ok: false, error: "unsupported-url" };
+  if (!host.includes(".")) return { ok: false, error: "unsupported-url" }; // single-label intranet names
   return { ok: true, url };
 }
 

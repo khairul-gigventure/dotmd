@@ -88,7 +88,7 @@ DotMD also has a small web app (PWA) for your phone. Paste a link and get Markdo
 
 **Use it on iPhone**
 
-1. Open the app address in Safari (see "Set it up" below).
+1. Open the app address in Safari: `https://khairul-gigventure.github.io/dotmd/` (after you finish "Set it up" below).
 2. Tap Share, then **Add to Home Screen**.
 3. Open DotMD, tap **Paste** (or type a link), then **Clip**.
 4. Tap **Copy Markdown**, **Download .md**, or **Share** (send straight to ChatGPT, Claude or Files).
@@ -97,13 +97,13 @@ Tip: you can also open the app with a link already filled in: `<app address>/?ur
 
 **Set it up (one time, free)**
 
-The web app needs a small server to fetch the link for you (a phone browser cannot read other websites directly). It runs on Cloudflare Workers, which is free for this use (100,000 requests per day).
+The web app needs a small server to fetch the link for you (a phone browser cannot read other websites directly). It runs on Cloudflare Workers. The free plan allows 100,000 requests per day, but it also limits CPU time per request (about 10 ms). X, Threads and Facebook links are light, but a long web article may hit that limit and fail. If that happens, the Workers Paid plan (about USD 5 per month) removes the problem. Test your own articles after you deploy.
 
 1. Create a free account at [cloudflare.com](https://dash.cloudflare.com/sign-up).
 2. In this folder: `npm install`, then `npx wrangler login` (a browser window opens, click Allow).
 3. Deploy the server: `npm run worker:deploy`. Copy the address it prints (it ends with `.workers.dev`).
-4. Put that address in `web/config.js` as `API_BASE`, then push to GitHub. The web app updates by itself through GitHub Pages.
-5. If your GitHub Pages address is different from `https://khairul-gigventure.github.io`, change `ALLOWED_ORIGIN` in `worker/wrangler.toml` and deploy again. Only addresses listed there may use your server.
+4. Put that address in `web/config.js` as `API_BASE`, then push to GitHub. In your repository go to **Settings → Pages** and set **Source** to **GitHub Actions** (once). After that the web app updates by itself on every push.
+5. If your GitHub Pages address is different from `https://khairul-gigventure.github.io`, change `ALLOWED_ORIGIN` in `worker/wrangler.toml` and deploy again. Browsers from other addresses are refused. This is a basic filter, not a password: someone who knows your server address and writes their own program can still send requests. If you see strange traffic, add a rate-limit rule in the Cloudflare dashboard (Security → WAF).
 
 **Privacy for the mobile app:** the link you enter is sent to your own Cloudflare Worker, which fetches the page and returns Markdown. The code stores nothing and does not log links. Cloudflare keeps normal infrastructure logs, as with any Cloudflare service. The browser extension above still makes no network requests of its own.
 

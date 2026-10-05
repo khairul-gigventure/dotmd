@@ -7,7 +7,7 @@ import { Readability } from "@mozilla/readability";
 import TurndownService from "turndown";
 import { gfm } from "turndown-plugin-gfm";
 import extract from "../../extract.js";
-import { parseDoc } from "../src/dom.js";
+import { parseDoc, stripNoise } from "../src/dom.js";
 
 const { extractArticle } = extract;
 const dir = path.dirname(fileURLToPath(import.meta.url));
@@ -53,4 +53,14 @@ test("extractArticle works with Turndown's browser build and no global document"
   });
   assert.strictEqual(r.ok, true);
   assert.ok(r.markdown.includes("## A list"));
+});
+
+test("stripNoise removes scripts, styles, svg and comments but keeps JSON-LD", () => {
+  const html = `<html><head><style>.a{color:red}</style><script>var BIGSCRIPT=1;</script>
+    <script type="application/ld+json">{"author":"Ada"}</script><!-- COMMENT --></head>
+    <body><svg><path d="M0"/></svg><noscript><img src="x.jpg"></noscript><p>keep</p></body></html>`;
+  const out = stripNoise(html);
+  assert.ok(!out.includes("BIGSCRIPT") && !out.includes("color:red") && !out.includes("<svg") && !out.includes("COMMENT"));
+  assert.ok(out.includes("application/ld+json") && out.includes('"author":"Ada"'));
+  assert.ok(out.includes("<noscript>") && out.includes("<p>keep</p>"));
 });

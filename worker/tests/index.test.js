@@ -3,7 +3,8 @@ import assert from "node:assert";
 import { pickHandler, createWorker } from "../src/index.js";
 import { ERROR_MESSAGES } from "../src/messages.js";
 
-const ENV = { ALLOWED_ORIGIN: "https://khairul-gigventure.github.io,https://other.example" };
+const OK_ORIGIN = "https://khairul-gigventure.github.io";
+const ENV = { ALLOWED_ORIGIN: `${OK_ORIGIN},https://other.example`, ALLOW_LOCALHOST: "true" };
 const ok = (kind) => async () => ({ ok: true, kind, title: "T", markdown: "# T", words: 1, filename: "t.md" });
 const worker = (handlers = {}) =>
   createWorker({
@@ -11,8 +12,8 @@ const worker = (handlers = {}) =>
     fetchLimited: async () => ({ ok: false, error: "fetch-failed" }),
     now: () => new Date(2026, 9, 5),
   });
-const get = (w, qs, headers = {}, method = "GET", path = "/api/clip") =>
-  w.fetch(new Request(`https://worker.test${path}${qs}`, { method, headers }), ENV);
+const get = (w, qs, headers = {}, method = "GET", path = "/api/clip", env = ENV) =>
+  w.fetch(new Request(`https://worker.test${path}${qs}`, { method, headers: { origin: OK_ORIGIN, ...headers } }), env);
 const link = (u) => `?url=${encodeURIComponent(u)}`;
 
 test("pickHandler routes by hostname", () => {
@@ -62,17 +63,35 @@ test("a throwing handler -> 500 internal", async () => {
   assert.strictEqual((await res.json()).error, "internal");
 });
 
-test("CORS header only for allowed origins (and localhost)", async () => {
+test("allowed origin and (opt-in) localhost get CORS headers", async () => {
   const q = link("https://example.com/a");
-  const allowed = await get(worker(), q, { origin: "https://khairul-gigventure.github.io" });
-  assert.strictEqual(allowed.headers.get("access-control-allow-origin"), "https://khairul-gigventure.github.io");
+  const allowed = await get(worker(), q);
+  assert.strictEqual(allowed.status, 200);
+  assert.strictEqual(allowed.headers.get("access-control-allow-origin"), OK_ORIGIN);
   assert.match(allowed.headers.get("vary"), /Origin/i);
   const local = await get(worker(), q, { origin: "http://127.0.0.1:8765" });
   assert.strictEqual(local.headers.get("access-control-allow-origin"), "http://127.0.0.1:8765");
+  const errAllowed = await get(worker(), "");
+  assert.strictEqual(errAllowed.status, 400);
+  assert.strictEqual(errAllowed.headers.get("access-control-allow-origin"), OK_ORIGIN);
+});
+
+test("localhost origins are refused unless ALLOW_LOCALHOST=true", async () => {
+  const res = await get(worker(), link("https://example.com/a"), { origin: "http://localhost:3000" }, "GET", "/api/clip", { ALLOWED_ORIGIN: OK_ORIGIN });
+  assert.strictEqual(res.status, 403);
+  assert.strictEqual(res.headers.get("access-control-allow-origin"), null);
+  const evilLocal = await get(worker(), link("https://example.com/a"), { origin: "http://localhost.evil.com" });
+  assert.strictEqual(evilLocal.status, 403);
+});
+
+test("requests from unlisted or missing origins are refused with 403 forbidden-origin", async () => {
+  const q = link("https://example.com/a");
   const evil = await get(worker(), q, { origin: "https://evil.example" });
+  assert.strictEqual(evil.status, 403);
   assert.strictEqual(evil.headers.get("access-control-allow-origin"), null);
-  const errAllowed = await get(worker(), "", { origin: "https://khairul-gigventure.github.io" });
-  assert.strictEqual(errAllowed.headers.get("access-control-allow-origin"), "https://khairul-gigventure.github.io");
+  assert.deepStrictEqual(await evil.json(), { ok: false, error: "forbidden-origin", message: ERROR_MESSAGES["forbidden-origin"] });
+  const bare = await worker().fetch(new Request(`https://worker.test/api/clip${q}`), ENV);
+  assert.strictEqual(bare.status, 403);
 });
 
 test("OPTIONS preflight, wrong method and unknown path", async () => {

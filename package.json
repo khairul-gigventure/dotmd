@@ -25,7 +25,7 @@
     "test": "node --test",
     "vendor": "sh scripts/vendor.sh",
     "zip": "sh scripts/package.sh",
-    "worker:dev": "wrangler dev -c worker/wrangler.toml",
+    "worker:dev": "wrangler dev -c worker/wrangler.toml --var ALLOW_LOCALHOST:true",
     "worker:deploy": "wrangler deploy -c worker/wrangler.toml"
   },
   "devDependencies": {

@@ -4,11 +4,17 @@ import { readOg } from "../og.js";
 const { buildMarkdown, slugify, todayISO } = convert;
 
 export const FACEBOOK_NOTE = "Facebook: teks dipotong (~200 aksara). Post penuh perlu dibuka sendiri.";
-const LOGIN_TITLE = /^(log in|log into|masuk|facebook$)/i;
+const LOGIN_TITLE = /^(log in|log into|masuk|sign up|facebook\s*([-\u2013\u2014|]|$))/i;
+const LOGIN_PATH = /^\/(login|checkpoint)\b|^\/$/;
 
 export async function handleFacebook(url, deps) {
   const page = await deps.fetchLimited(url);
   if (!page.ok) return { ok: false, error: page.error };
+
+  // A logged-out request to a private post usually ends up on the login page or the homepage.
+  let landedOnLogin = false;
+  try { landedOnLogin = LOGIN_PATH.test(new URL(page.finalUrl).pathname); } catch { /* keep false */ }
+  if (landedOnLogin) return { ok: false, error: "private-or-missing" };
 
   const og = readOg(page.text);
   const text = (og.description || "").trim();

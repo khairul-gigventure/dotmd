@@ -16,7 +16,8 @@ export async function handleThreads(url, deps) {
   if (!page.ok) return { ok: false, error: page.error };
 
   const og = readOg(page.text);
-  const text = (og.description || og.title || "").trim();
+  const generic = /^threads$/i.test((og.title || "").trim()); // login wall / deleted post
+  const text = (og.description || (generic ? "" : og.title) || "").trim();
   if (!text) return { ok: false, error: "private-or-missing" };
 
   const title = `@${parsed.handle} on Threads`;

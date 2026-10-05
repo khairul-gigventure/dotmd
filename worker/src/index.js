@@ -17,7 +17,7 @@ export function pickHandler(url) {
 
 function corsHeaders(origin, env) {
   const allowed = String(env?.ALLOWED_ORIGIN || "").split(",").map((s) => s.trim()).filter(Boolean);
-  const local = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin || "");
+  const local = String(env?.ALLOW_LOCALHOST) === "true" && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin || "");
   const headers = { vary: "Origin" };
   if (origin && (allowed.includes(origin) || local)) headers["access-control-allow-origin"] = origin;
   return headers;
@@ -52,6 +52,10 @@ export function createWorker(deps = {}) {
         });
       }
       if (request.method !== "GET") return json({ ok: false, error: "method-not-allowed" }, 405, cors);
+
+      // Only the PWA's own origin (plus localhost when explicitly enabled for dev) may use this Worker.
+      // This is a cheap filter against casual abuse, not authentication: non-browser clients can forge Origin.
+      if (!cors["access-control-allow-origin"]) return failure("forbidden-origin", cors);
 
       const checked = validateUrl(searchParams.get("url") || "");
       if (!checked.ok) return failure(checked.error, cors);

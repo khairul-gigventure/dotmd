@@ -9,6 +9,7 @@ export const ERROR_MESSAGES = {
   "private-or-missing": "Post ni private, dipadam, atau tak boleh dibaca tanpa login.",
   "fetch-failed": "Gagal ambil page ni. Cuba lagi.",
   internal: "Ada masalah di server DotMD. Cuba lagi.",
+  "forbidden-origin": "Permintaan ni tak dibenarkan dari alamat ini.",
 };
 
 export const ERROR_STATUS = {
@@ -22,4 +23,5 @@ export const ERROR_STATUS = {
   "private-or-missing": 404,
   "fetch-failed": 502,
   internal: 500,
+  "forbidden-origin": 403,
 };

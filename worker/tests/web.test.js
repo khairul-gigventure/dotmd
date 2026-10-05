@@ -39,3 +39,13 @@ test("handleWeb passes fetch errors through", async () => {
   const fl = async () => ({ ok: false, error: "blocked" });
   assert.deepStrictEqual(await handleWeb(U, { fetchLimited: fl, now: NOW }), { ok: false, error: "blocked" });
 });
+
+test("handleWeb still finds the author from JSON-LD after scripts are stripped", async () => {
+  const base = fixture("article.html").replace(/<meta name="author"[^>]*>/, "");
+  const html = base.replace("</head>", '<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","author":{"@type":"Person","name":"Aisyah Rahman"}}</script><script>var HUGE="' + "x".repeat(5000) + '";</script></head>');
+  const fl = async () => ({ ok: true, text: html, finalUrl: "https://blog.example.com/post", contentType: "text/html" });
+  const r = await handleWeb(U, { fetchLimited: fl, now: NOW });
+  assert.strictEqual(r.ok, true);
+  assert.ok(r.markdown.includes("author: Aisyah Rahman"));
+  assert.ok(!r.markdown.includes("HUGE"));
+});

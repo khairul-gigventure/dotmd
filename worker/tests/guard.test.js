@@ -121,3 +121,23 @@ test("fetchLimited maps a throwing fetch to fetch-failed", async () => {
   const impl = async () => { throw new Error("network down"); };
   assert.strictEqual((await fetchLimited(U("https://example.com/"), { fetchImpl: impl })).error, "fetch-failed");
 });
+
+test("validateUrl also rejects reserved IPv4/IPv6 ranges, single-label and .internal hosts", () => {
+  const bad = [
+    "http://192.0.0.8/", "http://198.18.0.1/", "http://198.19.255.1/", "http://224.0.0.1/",
+    "http://240.0.0.1/", "http://255.255.255.255/",
+    "http://[::7f00:1]/", "http://[2002:7f00:1::]/", "http://[fec0::1]/", "http://[ff02::1]/",
+    "http://[::ffff:127.0.0.1]/", "http://[64:ff9b::7f00:1]/",
+    "http://intranet/", "http://metadata.google.internal/", "http://foo.internal/",
+  ];
+  for (const raw of bad) {
+    const r = validateUrl(raw);
+    assert.deepStrictEqual([raw, r.ok, r.error], [raw, false, "unsupported-url"]);
+  }
+});
+
+test("validateUrl still accepts public IPv4, IPv6 and normal hosts", () => {
+  for (const raw of ["http://93.184.216.34/", "http://[2606:4700:4700::1111]/", "https://sub.example.co.uk/a", "http://198.20.0.1/"]) {
+    assert.strictEqual(validateUrl(raw).ok, true, raw);
+  }
+});

@@ -26,3 +26,13 @@ export function parseDoc(html, url) {
   }
   return document;
 }
+
+// Workers on the free plan have ~10 ms CPU per request, so drop the heaviest, never-article bytes before
+// parsing. JSON-LD scripts stay (Readability reads author/title from them); <noscript> stays (lazy images).
+export function stripNoise(html) {
+  return html
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<script\b(?![^>]*type\s*=\s*["']?application\/ld\+json)[^>]*>[\s\S]*?<\/script\s*>/gi, "")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, "")
+    .replace(/<svg\b[\s\S]*?<\/svg\s*>/gi, "");
+}

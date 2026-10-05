@@ -31,3 +31,9 @@ test("clipEndpoint encodes the target URL", () => {
     "https://w.dev/api/clip?url=https%3A%2F%2Fa.com%2F%3Fq%3D1%26r%3D2"
   );
 });
+
+test("extractUrl keeps a balanced closing parenthesis (Wikipedia-style URLs)", () => {
+  assert.strictEqual(extractUrl("https://en.wikipedia.org/wiki/Foo_(bar)"), "https://en.wikipedia.org/wiki/Foo_(bar)");
+  assert.strictEqual(extractUrl("(see https://en.wikipedia.org/wiki/Foo_(bar))"), "https://en.wikipedia.org/wiki/Foo_(bar)");
+  assert.strictEqual(extractUrl("(https://example.com/a)"), "https://example.com/a");
+});

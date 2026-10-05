@@ -88,7 +88,7 @@ DotMD ada juga web app kecil (PWA) untuk phone. Paste link dan dapat Markdown, t
 
 **Guna di iPhone**
 
-1. Buka alamat app dalam Safari (lihat "Cara set up" di bawah).
+1. Buka alamat app dalam Safari: `https://khairul-gigventure.github.io/dotmd/` (selepas siap "Cara set up" di bawah).
 2. Tekan Share, kemudian **Add to Home Screen**.
 3. Buka DotMD, tekan **Paste** (atau taip link), kemudian **Clip**.
 4. Tekan **Copy Markdown**, **Download .md**, atau **Share** (hantar terus ke ChatGPT, Claude atau Files).
@@ -97,13 +97,13 @@ Tip: app boleh dibuka dengan link yang dah terisi: `<alamat app>/?url=https://ex
 
 **Cara set up (sekali sahaja, percuma)**
 
-Web app perlukan server kecil untuk ambil link bagi pihak awak (browser phone tak boleh baca website lain terus). Ia jalan atas Cloudflare Workers, percuma untuk kegunaan ni (100,000 permintaan sehari).
+Web app perlukan server kecil untuk ambil link bagi pihak awak (browser phone tak boleh baca website lain terus). Ia jalan atas Cloudflare Workers. Plan percuma bagi 100,000 permintaan sehari, tapi ada had masa CPU setiap permintaan (lebih kurang 10 ms). Link X, Threads dan Facebook ringan, tapi web article yang panjang mungkin terkena had ni dan gagal. Kalau berlaku, plan Workers Paid (lebih kurang USD 5 sebulan) selesaikan masalah tu. Cuba article awak sendiri selepas deploy.
 
 1. Buat akaun percuma di [cloudflare.com](https://dash.cloudflare.com/sign-up).
 2. Dalam folder ni: `npm install`, kemudian `npx wrangler login` (tetingkap browser terbuka, klik Allow).
 3. Deploy server: `npm run worker:deploy`. Salin alamat yang keluar (berakhir dengan `.workers.dev`).
-4. Letak alamat tu dalam `web/config.js` sebagai `API_BASE`, kemudian push ke GitHub. Web app update sendiri melalui GitHub Pages.
-5. Kalau alamat GitHub Pages awak lain daripada `https://khairul-gigventure.github.io`, tukar `ALLOWED_ORIGIN` dalam `worker/wrangler.toml` dan deploy semula. Hanya alamat yang disenaraikan di situ boleh guna server awak.
+4. Letak alamat tu dalam `web/config.js` sebagai `API_BASE`, kemudian push ke GitHub. Dalam repository, pergi **Settings → Pages** dan set **Source** kepada **GitHub Actions** (sekali sahaja). Lepas tu web app update sendiri setiap kali push.
+5. Kalau alamat GitHub Pages awak lain daripada `https://khairul-gigventure.github.io`, tukar `ALLOWED_ORIGIN` dalam `worker/wrangler.toml` dan deploy semula. Browser dari alamat lain akan ditolak. Ini penapis asas, bukan kata laluan: orang yang tahu alamat server awak dan menulis program sendiri masih boleh hantar permintaan. Kalau nampak trafik pelik, tambah rule rate-limit dalam dashboard Cloudflare (Security → WAF).
 
 **Privasi untuk app mobile:** link yang awak masukkan dihantar ke Cloudflare Worker milik awak sendiri, yang ambil page dan pulangkan Markdown. Kod tak simpan apa-apa dan tak log link. Cloudflare simpan log infrastruktur biasa, seperti mana-mana servis Cloudflare. Extension browser di atas masih tak buat sebarang network request sendiri.
 
