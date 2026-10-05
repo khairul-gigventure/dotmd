@@ -53,7 +53,7 @@
       bulletListMarker: "-",
     });
     turndown.use(gfm);
-    const body = turndown.turndown(container.innerHTML);
+    const body = turndown.turndown(container); // node, not string: string input needs a global `document`
 
     const title = (parsed.title || "").trim();
     const meta = {

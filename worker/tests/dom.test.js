@@ -42,3 +42,15 @@ test("homepage and listing are not articles under linkedom", () => {
   assert.deepStrictEqual(run("homepage.html"), { ok: false, reason: "no-article" });
   assert.deepStrictEqual(run("listing.html"), { ok: false, reason: "no-article" });
 });
+
+// Regression: the Worker bundle uses Turndown's *browser* build, which parses HTML strings with the
+// global `document` (absent in Workers). extractArticle must hand Turndown a DOM node instead.
+test("extractArticle works with Turndown's browser build and no global document", async () => {
+  assert.strictEqual(typeof globalThis.document, "undefined");
+  const { default: BrowserTurndown } = await import("turndown/lib/turndown.browser.es.js");
+  const r = extractArticle(parseDoc(fixture("article.html"), URL_), {
+    url: URL_, now: new Date(2026, 9, 5), Readability, TurndownService: BrowserTurndown, gfm,
+  });
+  assert.strictEqual(r.ok, true);
+  assert.ok(r.markdown.includes("## A list"));
+});
