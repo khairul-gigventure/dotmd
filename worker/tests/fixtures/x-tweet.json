@@ -1,0 +1,11 @@
+{
+  "__typename": "Tweet",
+  "id_str": "20",
+  "created_at": "2006-03-21T20:50:14.000Z",
+  "text": "just setting up my twttr",
+  "user": { "id_str": "12", "name": "jack", "screen_name": "jack" },
+  "mediaDetails": [
+    { "type": "photo", "media_url_https": "https://pbs.twimg.com/media/abc.jpg" },
+    { "type": "video", "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/xyz.jpg" }
+  ]
+}
