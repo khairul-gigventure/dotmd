@@ -71,6 +71,42 @@ DotMD **tak buat sebarang network request**, tiada akaun, dan tak kumpul apa-apa
 | `scripting` | Jalankan penukar pada tab tu. |
 | `clipboardWrite` | Benarkan butang **Copy Markdown** copy teks. |
 
+## Mobile (iPhone)
+
+DotMD ada juga web app kecil (PWA) untuk phone. Paste link dan dapat Markdown, tanpa extension.
+
+**Apa yang jalan**
+
+| Link | Hasil |
+|---|---|
+| Web article biasa | Article penuh sebagai Markdown |
+| Post X (Twitter) | Teks post dan gambar (satu post, bukan thread penuh) |
+| Post Threads (awam) | Teks post |
+| Post Facebook (awam) | Hanya ~200 aksara pertama, dengan nota. Facebook tak bagi lebih tanpa login |
+
+**Apa yang tak jalan:** post private, apa-apa yang perlu login, thread X (rangkaian post), dan site yang block server (Medium selalunya kena block di sini; guna extension desktop untuk itu).
+
+**Guna di iPhone**
+
+1. Buka alamat app dalam Safari (lihat "Cara set up" di bawah).
+2. Tekan Share, kemudian **Add to Home Screen**.
+3. Buka DotMD, tekan **Paste** (atau taip link), kemudian **Clip**.
+4. Tekan **Copy Markdown**, **Download .md**, atau **Share** (hantar terus ke ChatGPT, Claude atau Files).
+
+Tip: app boleh dibuka dengan link yang dah terisi: `<alamat app>/?url=https://example.com/article`.
+
+**Cara set up (sekali sahaja, percuma)**
+
+Web app perlukan server kecil untuk ambil link bagi pihak awak (browser phone tak boleh baca website lain terus). Ia jalan atas Cloudflare Workers, percuma untuk kegunaan ni (100,000 permintaan sehari).
+
+1. Buat akaun percuma di [cloudflare.com](https://dash.cloudflare.com/sign-up).
+2. Dalam folder ni: `npm install`, kemudian `npx wrangler login` (tetingkap browser terbuka, klik Allow).
+3. Deploy server: `npm run worker:deploy`. Salin alamat yang keluar (berakhir dengan `.workers.dev`).
+4. Letak alamat tu dalam `web/config.js` sebagai `API_BASE`, kemudian push ke GitHub. Web app update sendiri melalui GitHub Pages.
+5. Kalau alamat GitHub Pages awak lain daripada `https://khairul-gigventure.github.io`, tukar `ALLOWED_ORIGIN` dalam `worker/wrangler.toml` dan deploy semula. Hanya alamat yang disenaraikan di situ boleh guna server awak.
+
+**Privasi untuk app mobile:** link yang awak masukkan dihantar ke Cloudflare Worker milik awak sendiri, yang ambil page dan pulangkan Markdown. Kod tak simpan apa-apa dan tak log link. Cloudflare simpan log infrastruktur biasa, seperti mana-mana servis Cloudflare. Extension browser di atas masih tak buat sebarang network request sendiri.
+
 ## Untuk developer
 
 ```bash
@@ -78,11 +114,13 @@ npm install      # tools untuk test sahaja (extension sendiri tak perlu build)
 npm test         # jalankan test
 npm run vendor   # update lib/ dari node_modules
 npm run zip      # bina dist/dotmd-<versi>.zip untuk release
+npm run worker:dev     # jalankan server mobile secara lokal (port 8787)
+npm run worker:deploy  # deploy server mobile ke Cloudflare
 ```
 
 Cara ia berfungsi: popup inject [Readability](https://github.com/mozilla/readability) (cari article) dan [Turndown](https://github.com/mixmark-io/turndown) (HTML ke Markdown) ke tab semasa, kemudian pulangkan Markdown. Lihat `extract.js` (logik utama) dan `src/convert.js` (tajuk, nama fail, header). Nota design asal ada dalam [`docs/`](docs/).
 
-Issue dan pull request dialu-alukan. Sila jalankan `npm test` sebelum hantar perubahan.
+Folder: fail extension di root, `web/` (PWA mobile), `worker/` (Cloudflare Worker). Issue dan pull request dialu-alukan. Sila jalankan `npm test` sebelum hantar perubahan.
 
 ## Lesen
 

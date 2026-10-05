@@ -71,6 +71,42 @@ DotMD makes **no network requests**, has no account, and collects nothing. It as
 | `scripting` | Run the converter on that tab. |
 | `clipboardWrite` | Let the **Copy Markdown** button copy the text. |
 
+## Mobile (iPhone)
+
+DotMD also has a small web app (PWA) for your phone. Paste a link and get Markdown, with no extension needed.
+
+**What works**
+
+| Link | Result |
+|---|---|
+| Normal web article | Full article as Markdown |
+| X (Twitter) post | The post text and photos (one post, not whole threads) |
+| Threads post (public) | The post text |
+| Facebook post (public) | Only the first ~200 characters, with a note. Facebook does not give more without login |
+
+**What does not work:** private posts, anything that needs login, X threads (chains of posts), and some sites that block servers (Medium is often blocked here; use the desktop extension for those).
+
+**Use it on iPhone**
+
+1. Open the app address in Safari (see "Set it up" below).
+2. Tap Share, then **Add to Home Screen**.
+3. Open DotMD, tap **Paste** (or type a link), then **Clip**.
+4. Tap **Copy Markdown**, **Download .md**, or **Share** (send straight to ChatGPT, Claude or Files).
+
+Tip: you can also open the app with a link already filled in: `<app address>/?url=https://example.com/article`.
+
+**Set it up (one time, free)**
+
+The web app needs a small server to fetch the link for you (a phone browser cannot read other websites directly). It runs on Cloudflare Workers, which is free for this use (100,000 requests per day).
+
+1. Create a free account at [cloudflare.com](https://dash.cloudflare.com/sign-up).
+2. In this folder: `npm install`, then `npx wrangler login` (a browser window opens, click Allow).
+3. Deploy the server: `npm run worker:deploy`. Copy the address it prints (it ends with `.workers.dev`).
+4. Put that address in `web/config.js` as `API_BASE`, then push to GitHub. The web app updates by itself through GitHub Pages.
+5. If your GitHub Pages address is different from `https://khairul-gigventure.github.io`, change `ALLOWED_ORIGIN` in `worker/wrangler.toml` and deploy again. Only addresses listed there may use your server.
+
+**Privacy for the mobile app:** the link you enter is sent to your own Cloudflare Worker, which fetches the page and returns Markdown. The code stores nothing and does not log links. Cloudflare keeps normal infrastructure logs, as with any Cloudflare service. The browser extension above still makes no network requests of its own.
+
 ## For developers
 
 ```bash
@@ -78,11 +114,13 @@ npm install      # test tools only (the extension itself needs no build step)
 npm test         # run the tests
 npm run vendor   # refresh lib/ from node_modules
 npm run zip      # build dist/dotmd-<version>.zip for a release
+npm run worker:dev     # run the mobile server locally (port 8787)
+npm run worker:deploy  # deploy the mobile server to Cloudflare
 ```
 
 How it works: the popup injects [Readability](https://github.com/mozilla/readability) (finds the article) and [Turndown](https://github.com/mixmark-io/turndown) (HTML to Markdown) into the current tab, then returns the Markdown. See `extract.js` (main logic) and `src/convert.js` (title, filename, header block). The original design notes are in [`docs/`](docs/).
 
-Issues and pull requests are welcome. Please run `npm test` before you send a change.
+Folders: extension files at the root, `web/` (mobile PWA), `worker/` (Cloudflare Worker). Issues and pull requests are welcome. Please run `npm test` before you send a change.
 
 ## License
 
