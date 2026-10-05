@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>DotMD</title>
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="DotMD">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>DotMD</h1>
+    <p class="lead">Paste link article, post X, Threads atau Facebook. Dapat Markdown yang bersih.</p>
+
+    <label for="url" class="sr">Link</label>
+    <input id="url" type="url" inputmode="url" placeholder="https://…" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="row">
+      <button id="paste" type="button">Paste</button>
+      <button id="clip" type="button" class="primary">Clip</button>
+    </div>
+
+    <p id="status" role="status" aria-live="polite"></p>
+
+    <section id="result" hidden>
+      <p class="meta"><span id="kind" class="badge"></span> <span id="words"></span></p>
+      <h2 id="title"></h2>
+      <p id="note" class="note" hidden></p>
+      <div class="row">
+        <button id="copy" type="button" class="primary">Copy Markdown</button>
+      </div>
+      <div class="row">
+        <button id="download" type="button">Download .md</button>
+        <button id="share" type="button">Share</button>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

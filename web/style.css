@@ -1,0 +1,31 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f6f7f9; --fg: #111827; --muted: #6b7280; --card: #ffffff; --line: #d9dde3;
+  --accent: #111827; --on-accent: #ffffff; --ok: #059669; --err: #b91c1c;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0b0f17; --fg: #f3f4f6; --muted: #9ca3af; --card: #151b27; --line: #2a3345;
+    --accent: #34d399; --on-accent: #052e22; --ok: #34d399; --err: #f87171; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg);
+  font: 16px/1.5 -apple-system, system-ui, sans-serif;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+main { max-width: 560px; margin: 0 auto; }
+h1 { margin: 8px 0 4px; font-size: 28px; }
+h2 { margin: 4px 0 8px; font-size: 18px; word-break: break-word; }
+.lead { margin: 0 0 16px; color: var(--muted); }
+.sr { position: absolute; left: -9999px; }
+input { width: 100%; min-height: 48px; padding: 12px 14px; font: inherit; color: inherit;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.row { display: flex; gap: 10px; margin-top: 10px; }
+button { flex: 1; min-height: 48px; padding: 10px 14px; font: inherit; font-weight: 600; color: var(--fg);
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+button:disabled { opacity: .5; }
+#status { min-height: 1.5em; margin: 14px 0 0; color: var(--muted); }
+#status.error { color: var(--err); }
+#result { margin-top: 12px; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.meta { margin: 0; color: var(--muted); font-size: 14px; }
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--fg); }
+.note { margin: 0 0 8px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--accent) 12%, transparent); font-size: 14px; }
