@@ -24,10 +24,10 @@
   // gfm only emits a Markdown table when the first row is a header row.
   function ensureTableHeaders(container) {
     for (const table of container.querySelectorAll("table")) {
-      const firstRow = table.rows[0];
+      const firstRow = table.querySelector("tr"); // querySelector: linkedom has no table.rows
       if (!firstRow || table.querySelector("thead")) continue;
-      if ([...firstRow.cells].every((c) => c.nodeName === "TH")) continue;
-      for (const cell of [...firstRow.cells]) {
+      if ([...firstRow.children].every((c) => c.nodeName === "TH")) continue;
+      for (const cell of [...firstRow.children]) {
         const th = table.ownerDocument.createElement("th");
         th.innerHTML = cell.innerHTML;
         cell.replaceWith(th);

@@ -24,12 +24,16 @@
   "scripts": {
     "test": "node --test",
     "vendor": "sh scripts/vendor.sh",
-    "zip": "sh scripts/package.sh"
+    "zip": "sh scripts/package.sh",
+    "worker:dev": "wrangler dev -c worker/wrangler.toml",
+    "worker:deploy": "wrangler deploy -c worker/wrangler.toml"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.6.0",
     "jsdom": "^30.1.2",
+    "linkedom": "^0.18.13",
     "turndown": "^7.2.4",
-    "turndown-plugin-gfm": "^1.0.2"
+    "turndown-plugin-gfm": "^1.0.2",
+    "wrangler": "^4.147.0"
   }
 }
